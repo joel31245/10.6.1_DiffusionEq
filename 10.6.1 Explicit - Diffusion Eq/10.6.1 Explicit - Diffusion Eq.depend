@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1500583424 source:c:\users\jo\desktop\uh & official docs\uh classes\1.3 summer 2017\numerical methods, dr prosperretti\10.6.1 explicit - diffusion eq\main.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<string.h>
+
