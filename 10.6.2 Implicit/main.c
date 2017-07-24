@@ -18,12 +18,12 @@
 // These are equation/situation specific definitions
 #define n 1
 #define D 1.0
-#define tEND 4.0
+#define tEND 1.0
 #define xEND M_PI
 // These are up for variation to be more accurate
 #define lam .4
 #define dt (lam/D*dx*dx)
-#define dx (M_PI/10)
+#define dx (M_PI/100)
 int xSize = (double)xEND/dx +1;
 int tSize = (double)tEND/dt +1;
 char fileName[100];
@@ -104,29 +104,29 @@ void printAll( double u[tSize][xSize] ){
 
     for( i=0; i<tSize; i++ ){
         for( j=0; j<xSize; j++ ){
-            if( j==0 )printf("\nESTIMATE:\t");
-            printf("%3.3lf   ", u[i][j] );
+            //if( j==0 )printf("\nESTIMATE:\t");
+            //printf("%3.3lf   ", u[i][j] );
             fprintf(bf,"%lf,", u[i][j]);
         }
         fprintf(bf,"\n");
 
         for( j=0; j<xSize; j++ ){
-            if( j==0 )printf("\nACTUAL:\t\t");
-            printf("%3.3lf   ", exact(i*dt, j*dx) );
+            //if( j==0 )printf("\nACTUAL:\t\t");
+            //printf("%3.3lf   ", exact(i*dt, j*dx) );
             fprintf(abf, "%lf,", exact(i*dt, j*dx) );
         }
         fprintf(abf,"\n");
 
-        printf("\nERROR:\t\t");
+        //printf("\nERROR:\t\t");
         for( j=0; j<xSize; j++ ){
             error = fabs( (exact(i*dt, j*dx)-u[i][j]) /exact(i*dt, j*dx) *100 );
             if (u[i][j]==0) error = 0.0;
-            printf("%3.3lf   ", error );
+            //printf("%3.3lf   ", error );
             fprintf(ef, "%lf,", error );
         }
         fprintf(ef, "\n");
 
-        printf("\n\n\n\n");
+        //printf("\n\n\n\n");
     }
 
     fclose(ef);
