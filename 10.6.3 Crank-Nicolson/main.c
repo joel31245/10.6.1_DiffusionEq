@@ -18,10 +18,10 @@
 // These are equation/situation specific definitions
 #define n 1
 #define D 1.0
-#define tEND 2.0
+#define tEND 10.0
 #define xEND M_PI
 // These are up for variation to be more accurate
-#define lam .8
+#define lam .4
 #define dt (lam/D*dx*dx)
 #define dx (M_PI/10)
 int xSize = xEND/dx +1;
@@ -147,20 +147,20 @@ void boundaryConditions( double u[tSize][xSize], int tRow ){
 void CNfillRow( double u[tSize][xSize], int tRow){
     /* STEP A: SETTING UP THE Tridiagonal */
     int N = xSize-1;
-    double alpha[N], a=1+2*lam, b=-lam/2, c=-lam/2, g[N]; int j;
+    double alpha[N], a=1+lam, b=-lam/2, c=-lam/2, g[N]; int j;
 
     /* STEP B: FORWARD THROUGH THE alpha's AND g's */
-    alpha[0] = a;
-    g[0] = ( lam/2.0*u[tRow-1][0] + (1-lam)*u[tRow-1][1] + lam/2.0*u[tRow-1][2] ) /a;
+    alpha[1] = a;
+    g[1] = ( lam/2.0*u[tRow-1][0] + (1-lam)*u[tRow-1][1] + lam/2.0*u[tRow-1][2] );
 
-    for( j=1; j<N; j++ ){
-        alpha[j] = a - b*c/alpha[j-1];
+    for( j=2; j<N; j++ ){
+        alpha[j] = a - (b*c)/alpha[j-1];
         g[j] = ( ( lam/2.0*u[tRow-1][j-1] + (1-lam)*u[tRow-1][j] + lam/2.0*u[tRow-1][j+1] ) - b/alpha[j-1]*g[j-1] );
     }
 
     /* STEP C: BACKWARD THROUGH u[tRow][j] */
     // Starting 2 below max because the end is set to 0 by "boundaryConditions" as it should be
-    u[tRow][xSize-2] = g[N-1];
+    u[tRow][xSize-2] = g[N-1]/alpha[N-1];
 
     for( j=N-2; j>0; j-- ){
         u[tRow][j] = ( g[j] - c*u[tRow][j+1] )/alpha[j];

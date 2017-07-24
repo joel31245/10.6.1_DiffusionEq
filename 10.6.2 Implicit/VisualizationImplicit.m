@@ -13,7 +13,7 @@ figure(1);
 % Actual Plot 
 subplot(2,3,1);
 mesh(Eactual);
-xlim([0 102.5]);
+xlim([0 12.5]);
 title('Actual');
 xlabel('X Value Index');
 ylabel('Time Index');
@@ -22,7 +22,7 @@ zlabel('U Values');
 % Implicit Estimate Plot
 subplot(2,3,2);
 mesh(Eestimate);
-xlim([0 102.5]);
+xlim([0 12.5]);
 title('Implicit Estimate');
 xlabel('X Value Index');
 ylabel('Time Index');
@@ -31,7 +31,7 @@ zlabel('U Values');
 % Implicit Estimate Error
 subplot(2,3,3);
 mesh(Eerror);
-xlim([0 102.5]);
+xlim([0 12.5]);
 title('Implicit Error');
 xlabel('X Value Index');
 ylabel('Time Index');
