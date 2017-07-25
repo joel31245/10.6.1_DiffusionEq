@@ -24,7 +24,7 @@
 #define lam .4
 #define dt (lam/D*dx*dx)
 #define dx (M_PI/10)
-int xSize = xEND/dx +1;
+int xSize = (double)xEND/dx +1;
 int tSize = (double)tEND/dt +1;
 char fileName[100];
 char fileNameTimeSepCSV[100];
@@ -32,8 +32,6 @@ char fileNameBlockCSV[100];
 char fileNameBlockActualCSV[100];
 char errorFile[101];
 char continu = 'y';
-
-// Constant
 
 
 /*
@@ -82,10 +80,11 @@ int main()
         /* STEP 4: Displaying the Results */
         printAll( U );
 
+        printf("\n\nLambda Marker to compare to Explicit:\n %lf\n\n", lam);
+
         printf("\nWould you like to continue again? (y/n) ");
         scanf(" %c", &continu);
     }
-
 
 
     return 0;
@@ -118,7 +117,7 @@ void printAll( double u[tSize][xSize] ){
         for( j=0; j<xSize; j++ ){
             if( j==0 )printf("\nERROR:\t\t");
             error = fabs(exact(i*dt, j*dx)-u[i][j])/exact(i*dt, j*dx) *100;
-            if( u[i][j] == 0 && ( j==0 || j==xSize-1) ) error = 0;
+            if( u[i][j] == 0 && ( j==0 || j==xSize-1) ) error = 0.0;
             printf("%lf\t", error );
             fprintf(ef, "%lf,", error );
         }
@@ -144,26 +143,27 @@ void boundaryConditions( double u[tSize][xSize], int tRow ){
     u[tRow][0] = 0;
     u[tRow][xSize-1] = 0;
 }
-void CNfillRow( double u[tSize][xSize], int tRow){
+
+void CNfillRow( double u[tSize][xSize], int t){
     /* STEP A: SETTING UP THE Tridiagonal */
     int N = xSize-1;
     double alpha[N], a=1+lam, b=-lam/2, c=-lam/2, g[N]; int j;
 
     /* STEP B: FORWARD THROUGH THE alpha's AND g's */
     alpha[1] = a;
-    g[1] = ( lam/2.0*u[tRow-1][0] + (1-lam)*u[tRow-1][1] + lam/2.0*u[tRow-1][2] );
+    g[1] = ( lam/2.0*u[t-1][0] + (1-lam)*u[t-1][1] + lam/2.0*u[t-1][2] );
 
     for( j=2; j<N; j++ ){
         alpha[j] = a - (b*c)/alpha[j-1];
-        g[j] = ( ( lam/2.0*u[tRow-1][j-1] + (1-lam)*u[tRow-1][j] + lam/2.0*u[tRow-1][j+1] ) - b/alpha[j-1]*g[j-1] );
+        g[j] = ( ( lam/2.0*u[t-1][j-1] + (1-lam)*u[t-1][j] + lam/2.0*u[t-1][j+1] ) - (b/alpha[j-1]*g[j-1]) );
     }
 
-    /* STEP C: BACKWARD THROUGH u[tRow][j] */
+    /* STEP C: BACKWARD THROUGH u[t][j] */
     // Starting 2 below max because the end is set to 0 by "boundaryConditions" as it should be
-    u[tRow][xSize-2] = g[N-1]/alpha[N-1];
+    u[t][xSize-2] = g[N-1]/alpha[N-1];
 
     for( j=N-2; j>0; j-- ){
-        u[tRow][j] = ( g[j] - c*u[tRow][j+1] )/alpha[j];
+        u[t][j] = ( g[j] - c*u[t][j+1] )/alpha[j];
     }
 
 }

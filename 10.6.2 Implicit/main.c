@@ -21,7 +21,7 @@
 #define tEND 10.0
 #define xEND M_PI
 // These are up for variation to be more accurate
-#define lam .8
+#define lam .4
 #define dt (lam/D*dx*dx)
 #define dx (M_PI/10)
 int xSize = (double)xEND/dx +1;
@@ -34,7 +34,6 @@ char errorFile[101];
 char continu = 'y';
 
 
-
 /*
    x : 0->PI
    t : 0->1
@@ -45,7 +44,6 @@ double F( double t, double x ){ return 0; }
 // STEPWISE COMPUTATIONAL FUNCTIONS
 void initializeU( double u[xSize][tSize] );
 void boundaryConditions( double u[tSize][xSize], int tRow );
-//void implicitfillRow( double[tSize][xSize], int, double );
 void implicitNOTESfillRow( double[tSize][xSize], int );
 // DISPLAY FUNCTION
 void printAll( double u[tSize][xSize] );
@@ -76,7 +74,6 @@ int main()
             boundaryConditions( U, i );
         /* STEP 3: Filling in the rest of the current time Step */
             implicitNOTESfillRow( U, i);
-
         }
 
 
@@ -146,7 +143,7 @@ void boundaryConditions( double u[tSize][xSize], int tRow ){
     u[tRow][0] = 0;
     u[tRow][xSize-1] = 0;
 }
-/* PROBLEM IS THE BEGINNING OF ROW HAS HIGH ERROR 50% & DECREASES ERROR AS IT GOES */
+
 void implicitNOTESfillRow( double u[tSize][xSize], int t){
     /* STEP A: SETTING UP THE Tridiagonal */
     int N = xSize-1;
