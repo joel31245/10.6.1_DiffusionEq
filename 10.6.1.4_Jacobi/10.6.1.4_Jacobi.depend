@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1501004812 source:c:\users\jo\desktop\vac_programsgit\numericalmethods\10.6.1_diffusioneq\10.6.1.4_jacobi\main.c
+1501021766 source:c:\users\jo\desktop\vac_programsgit\numericalmethods\10.6.1_diffusioneq\10.6.1.4_jacobi\main.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>

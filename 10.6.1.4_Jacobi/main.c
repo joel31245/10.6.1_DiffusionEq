@@ -20,6 +20,7 @@
 #define D 1.0
 #define tEND 10.0
 #define xEND M_PI
+#define K 1000
 // These are up for variation to be more accurate
 #define lam .8
 #define dx (M_PI/10)
@@ -42,9 +43,9 @@ char continu = 'y';
 // MINI FUNCTION SET TO 0 BY DEFAULT CONDITIONS defined by problem
 double F( double t, double x ){ return 0; }
 // STEPWISE COMPUTATIONAL FUNCTIONS
-void initializeU( double u[xSize][tSize] );
+void initializeU( double u[xSize][tSize], int );
 void boundaryConditions( double u[tSize][xSize], int tRow );
-void JacobifillRow( double[tSize][xSize], int );
+void gaussfillRow( double[tSize][xSize], int );
 // DISPLAY FUNCTION
 void printAll( double u[tSize][xSize] );
 // EXACT FUNCTION
@@ -66,14 +67,14 @@ int main()
         strcat(fileNameBlockActualCSV, "BLOCKACTUAL.csv");
 
         /* STEP 1: Set the initial U at t=0 for the length of the beam x: 0->PI */
-        initializeU( U );
+        initializeU( U, 0 );
 
         int i; // goes through all the time steps
         for( i=1; i<tSize; i++ ){
         /* STEP 2: Boundary Conditions for Next time Step */
             boundaryConditions( U, i );
         /* STEP 3: Filling in the rest of the current time Step */
-            JacobifillRow( U, i );
+            gaussfillRow( U, i );
         }
 
 
@@ -133,10 +134,10 @@ void printAll( double u[tSize][xSize] ){
 }
 
 
-void initializeU( double u[tSize][xSize] ){
+void initializeU( double u[tSize][xSize], int j ){
     int i;
     for( i=0; i<xSize; i++ ){
-        u[0][i] = sin(i*dx*n);
+        u[j][i] = sin(i*dx*n);
     }
 }
 void boundaryConditions( double u[tSize][xSize], int tRow ){
@@ -144,14 +145,18 @@ void boundaryConditions( double u[tSize][xSize], int tRow ){
     u[tRow][xSize-1] = 0;
 }
 
-void JacobifillRow( double u[tSize][xSize], int t){
-    /* STEP A: SETTING UP THE Variables for Jacobi */
+void gaussfillRow( double u[tSize][xSize], int t){
+    /* STEP A: SETTING UP THE Variables for gauss */
         // In Reality the a b and c would be a non tridiagonal matrix and they wouldnt be constant
-    double a=1+lam, b=-lam/2, c=-lam/2, f; int j;
+    double a=1+lam, b=-lam/2, c=-lam/2, f; int j; int k;
 
-        // Loop runs through all of the u's and calculates the new row. Excludes the boundary conditions
-    for( j=1; j<xSize-1; j++){
-        f = u[t-1][j];
-        u[t][j] = (f -( b*u[t-1][j-1] + c*u[t-1][j+1] ) )/a;
-    }
+    // Fill with the guess
+    initializeU( u, t );
+
+    for( k=0; k<K; k++)
+        for( j=1; j<xSize-1; j++){
+            f = u[t-1][j];
+            u[t][j] = (f -( b*u[t-1][j-1] + c*u[t-1][j+1] ) )/a;
+        }
+
 }
