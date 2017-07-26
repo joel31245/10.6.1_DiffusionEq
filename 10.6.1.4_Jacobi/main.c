@@ -5,7 +5,7 @@
 
 /*
     PROGRAM DISPLAYS THE DIFFUSION EQUATION FOR ENERGY? IN A BEAM THROUGH TIME
-    _________JACOBI_METHOD______________JACOBI_METHOD_________
+    _________GAUSS_METHOD______________GAUSS_METHOD_________
     Users Can Change the:
      - initializer multiple (n)     [defined]
      - density coefficient  (D)     [defined]
@@ -20,9 +20,9 @@
 #define D 1.0
 #define tEND 10.0
 #define xEND M_PI
-#define K 1000
+#define K 100000
 // These are up for variation to be more accurate
-#define lam .8
+#define lam .4
 #define dx (M_PI/10)
 #define dt (lam/D*dx*dx)
 int xSize = (double)xEND/dx +1;
@@ -45,7 +45,7 @@ double F( double t, double x ){ return 0; }
 // STEPWISE COMPUTATIONAL FUNCTIONS
 void initializeU( double u[xSize][tSize], int );
 void boundaryConditions( double u[tSize][xSize], int tRow );
-void gaussfillRow( double[tSize][xSize], int );
+void gaussSliedelfillRow( double[tSize][xSize], int );
 // DISPLAY FUNCTION
 void printAll( double u[tSize][xSize] );
 // EXACT FUNCTION
@@ -74,7 +74,7 @@ int main()
         /* STEP 2: Boundary Conditions for Next time Step */
             boundaryConditions( U, i );
         /* STEP 3: Filling in the rest of the current time Step */
-            gaussfillRow( U, i );
+            gaussSliedelfillRow( U, i );
         }
 
 
@@ -118,7 +118,7 @@ void printAll( double u[tSize][xSize] ){
         for( j=0; j<xSize; j++ ){
             if( j==0 )printf("\nERROR:\t\t");
             error = fabs(exact(i*dt, j*dx)-u[i][j])/exact(i*dt, j*dx) *100;
-            if( u[i][j] == 0 && ( j==0 || j==xSize-1) ) error = 0.0;
+            if( u[i][j] == 0 || ( j==0 || j==xSize-1) ) error = 0.0;
             printf("%lf\t", error );
             fprintf(ef, "%lf,", error );
         }
@@ -145,18 +145,30 @@ void boundaryConditions( double u[tSize][xSize], int tRow ){
     u[tRow][xSize-1] = 0;
 }
 
-void gaussfillRow( double u[tSize][xSize], int t){
-    /* STEP A: SETTING UP THE Variables for gauss */
+void gaussSliedelfillRow( double u[tSize][xSize], int t){
+    /* STEP A: SETTING UP THE Variables for gaussSliedel */
         // In Reality the a b and c would be a non tridiagonal matrix and they wouldnt be constant
-    double a=1+lam, b=-lam/2, c=-lam/2, f; int j; int k;
+    double a=1+ 2*lam, b=-lam, c=-lam, f; int j; int k;
+    double uT[xSize];
 
     // Fill with the guess
     initializeU( u, t );
 
+    // Fill the temporary array for the k iterations
+    for( j=0; j<xSize; j++){
+         uT[j] = u[t][j];
+    }
+
+    // Actual Gauss Formula for k iterations with the temporary array loaded
     for( k=0; k<K; k++)
         for( j=1; j<xSize-1; j++){
             f = u[t-1][j];
-            u[t][j] = (f -( b*u[t-1][j-1] + c*u[t-1][j+1] ) )/a;
+            uT[j] = (f -( b*uT[j-1] + c*uT[j+1] ) )/a;
         }
+
+    // Copying the temporary value back to the actual array
+    for( j=1; j<xSize-1; j++){
+        u[t][j] = uT[j];
+    }
 
 }

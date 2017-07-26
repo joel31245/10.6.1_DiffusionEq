@@ -149,8 +149,6 @@ void implicitNOTESfillRow( double u[tSize][xSize], int t){
     int N = xSize-1;
     double alpha[N], a=1+2*lam, b=-lam, c=-lam, g[N]; int j;
 
-        // Initial Column for the row
-
 
     /* STEP B: FORWARD THROUGH THE alpha's AND g's */
     alpha[1] = a;
